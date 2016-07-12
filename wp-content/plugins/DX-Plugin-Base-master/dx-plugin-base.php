@@ -216,10 +216,10 @@ class DX_Plugin_Base {
 		    
 		// register bottom box
 		add_meta_box(
-		    	'dx_bottom_meta_box',
-		    	__( "DX Bottom Box", 'dxbase' ), 
-		    	array( $this, 'dx_bottom_meta_box' ),
-		    	'' // leave empty quotes as '' if you want it on all custom post add/edit screens or add a post type slug
+		    	'dx_bottom_student_meta_box',
+		    	__( "Student Information", 'dxbase' ), 
+		    	array( $this, 'dx_bottom_student_meta_box' ),
+		    	'student' // leave empty quotes as '' if you want it on all custom post add/edit screens or add a post type slug
 		    );
 	}
 	
@@ -256,7 +256,7 @@ class DX_Plugin_Base {
 			return;
 		}
 
-		$slug = 'pluginbase';
+		$slug = 'student';
 		// If this isn't a 'book' post, don't update it.
 		if ( ! isset( $_POST['post_type'] ) || $slug != $_POST['post_type'] ) {
 			return;
@@ -275,8 +275,60 @@ class DX_Plugin_Base {
 	 * @param post $post the post object of the given page 
 	 * @param metabox $metabox metabox data
 	 */
-	public function dx_bottom_meta_box( $post, $metabox) {
-		_e( "<p>Bottom meta content here</p>", 'dxbase' );
+	public function dx_bottom_student_meta_box( $post, $metabox) {
+		wp_nonce_field( basename( __FILE__ ), 'student_nonce' );
+		$student_stored_meta = get_post_meta( $post->ID);
+		// retrieve student data
+		?>
+		<style>
+			#dx_bottom_student_meta_box .inside input {
+			    display: block;
+			}
+			#dx_bottom_student_meta_box .inside {
+			    background-color: #333;
+			    color: #fff;
+			}
+		</style>
+		<label for="student_year" class="student-info">Student Year:</label>
+		<input type="number" min="1" max="5" name="student_year" value="<?php if ( ! empty ( $student_stored_meta['student_year'] ) ){echo esc_attr( $student_stored_meta['student_year'][0] );} ?>"><br>
+
+		<label for="student_section" class="student-info">Student Section:</label>
+		<input type="text" maxlength="50" name="student_section" value="<?php if ( ! empty ( $student_stored_meta['student_section'] ) ){echo esc_attr( $student_stored_meta['student_section'][0] );} ?>"><br>
+
+		<label for="student_address" class="student-info">Student Address:</label>
+		<input class="student-address" type="text" maxlength="100" name="student_address" value="<?php if ( ! empty ( $student_stored_meta['student_address'] ) ){echo esc_attr( $student_stored_meta['student_address'][0] );} ?>"><br>
+
+		<label for="student_id" class="student-info">Student ID:</label>
+		<input type="text" maxlength="20" name="student_id" value="<?php if ( ! empty ( $student_stored_meta['student_id'] ) ){echo esc_attr( $student_stored_meta['student_id'][0] );} ?>"><br>
+
+	<?php
+
+	}
+
+	/**
+	 *Saving meta data of student
+	 */
+	public function student_meta_save( $post_id ) {
+		  // Checks save status
+		    $is_autosave = wp_is_post_autosave( $post_id );
+		    $is_revision = wp_is_post_revision( $post_id );
+		    $is_valid_nonce = ( isset( $_POST[ 'student_nonce' ] ) && wp_verify_nonce( $_POST[ 'student_nonce' ], basename( __FILE__ ) ) ) ? 'true' : 'false';
+		    // Exits script depending on save status
+		    if ( $is_autosave || $is_revision || !$is_valid_nonce ) {
+		        return;
+		    }
+		    if ( isset( $_POST[ 'student_year' ] ) ) {
+		      update_post_meta( $post_id, 'student_year', sanitize_text_field( $_POST[ 'student_year' ] ) );
+		    }
+		    if ( isset( $_POST[ 'student_section' ] ) ) {
+		      update_post_meta( $post_id, 'student_section', sanitize_text_field( $_POST[ 'student_section' ] ) );
+		    }
+		    if ( isset( $_POST[ 'student_address' ] ) ) {
+		      update_post_meta( $post_id, 'student_address', sanitize_text_field( $_POST[ 'student_address' ] ) );
+		    }
+		    if ( isset( $_POST[ 'student_id' ] ) ) {
+		      update_post_meta( $post_id, 'student_id', sanitize_text_field( $_POST[ 'student_id' ] ) );
+		    }
 	}
 	
 	/**
@@ -284,20 +336,20 @@ class DX_Plugin_Base {
      *
 	 */
 	public function dx_custom_post_types_callback() {
-		register_post_type( 'pluginbase', array(
+		register_post_type( 'student', array(
 			'labels' => array(
-				'name' => __("Base Items", 'dxbase'),
-				'singular_name' => __("Base Item", 'dxbase'),
+				'name' => __("Students", 'dxbase'),
+				'singular_name' => __("Student", 'dxbase'),
 				'add_new' => _x("Add New", 'pluginbase', 'dxbase' ),
-				'add_new_item' => __("Add New Base Item", 'dxbase' ),
-				'edit_item' => __("Edit Base Item", 'dxbase' ),
-				'new_item' => __("New Base Item", 'dxbase' ),
-				'view_item' => __("View Base Item", 'dxbase' ),
-				'search_items' => __("Search Base Items", 'dxbase' ),
-				'not_found' =>  __("No base items found", 'dxbase' ),
-				'not_found_in_trash' => __("No base items found in Trash", 'dxbase' ),
+				'add_new_item' => __("Add New Student", 'dxbase' ),
+				'edit_item' => __("Edit Student", 'dxbase' ),
+				'new_item' => __("New Student", 'dxbase' ),
+				'view_item' => __("View Student", 'dxbase' ),
+				'search_items' => __("Search Student", 'dxbase' ),
+				'not_found' =>  __("No student found", 'dxbase' ),
+				'not_found_in_trash' => __("No student found in Trash", 'dxbase' ),
 			),
-			'description' => __("Base Items for the demo", 'dxbase'),
+			'description' => __("Students for the demo", 'dxbase'),
 			'public' => true,
 			'publicly_queryable' => true,
 			'query_var' => true,
@@ -323,23 +375,23 @@ class DX_Plugin_Base {
      *
 	 */
 	public function dx_custom_taxonomies_callback() {
-		register_taxonomy( 'pluginbase_taxonomy', 'pluginbase', array(
+		register_taxonomy( 'student_taxonomy', 'pluginbase', array(
 			'hierarchical' => true,
 			'labels' => array(
-				'name' => _x( "Base Item Taxonomies", 'taxonomy general name', 'dxbase' ),
-				'singular_name' => _x( "Base Item Taxonomy", 'taxonomy singular name', 'dxbase' ),
+				'name' => _x( "Student Taxonomies", 'taxonomy general name', 'dxbase' ),
+				'singular_name' => _x( "Student Taxonomy", 'taxonomy singular name', 'dxbase' ),
 				'search_items' =>  __( "Search Taxonomies", 'dxbase' ),
 				'popular_items' => __( "Popular Taxonomies", 'dxbase' ),
 				'all_items' => __( "All Taxonomies", 'dxbase' ),
 				'parent_item' => null,
 				'parent_item_colon' => null,
-				'edit_item' => __( "Edit Base Item Taxonomy", 'dxbase' ), 
-				'update_item' => __( "Update Base Item Taxonomy", 'dxbase' ),
-				'add_new_item' => __( "Add New Base Item Taxonomy", 'dxbase' ),
-				'new_item_name' => __( "New Base Item Taxonomy Name", 'dxbase' ),
-				'separate_items_with_commas' => __( "Separate Base Item taxonomies with commas", 'dxbase' ),
-				'add_or_remove_items' => __( "Add or remove Base Item taxonomy", 'dxbase' ),
-				'choose_from_most_used' => __( "Choose from the most used Base Item taxonomies", 'dxbase' )
+				'edit_item' => __( "Edit Student Taxonomy", 'dxbase' ), 
+				'update_item' => __( "Update Student Taxonomy", 'dxbase' ),
+				'add_new_item' => __( "Add New Student Taxonomy", 'dxbase' ),
+				'new_item_name' => __( "New Student Taxonomy Name", 'dxbase' ),
+				'separate_items_with_commas' => __( "Separate Student taxonomies with commas", 'dxbase' ),
+				'add_or_remove_items' => __( "Add or remove Student taxonomy", 'dxbase' ),
+				'choose_from_most_used' => __( "Choose from the most used Student taxonomies", 'dxbase' )
 			),
 			'show_ui' => true,
 			'query_var' => true,
