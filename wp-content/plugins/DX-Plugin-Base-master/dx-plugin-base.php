@@ -69,7 +69,7 @@ class DX_Plugin_Base {
 		add_action( 'add_meta_boxes', array( $this, 'dx_meta_boxes_callback' ) );
 		
 		// register save_post hooks for saving the custom fields
-		add_action( 'save_post', array( $this, 'dx_save_sample_field' ) );
+		add_action( 'save_post', array( $this, 'student_meta_save' ) );
 		
 		// Register custom post types and taxonomies
 		add_action( 'init', array( $this, 'dx_custom_post_types_callback' ), 5 );
@@ -93,6 +93,8 @@ class DX_Plugin_Base {
 
 		// Add Student API
 		
+		// Page Template
+		add_action( 'template_include', array( $this, 'load_post_type_templates') );
 		/*
 		 * TODO:
 		 * 		template_redirect
@@ -183,7 +185,6 @@ class DX_Plugin_Base {
 	public function dx_plugin_side_access_page() {
 		include_once( DXP_PATH_INCLUDES . '/remote-page-template.php' );
 	}
-	
 	/**
 	 * 
 	 * The content of the subpage 
@@ -280,6 +281,7 @@ class DX_Plugin_Base {
 	public function dx_bottom_student_meta_box( $post, $metabox) {
 		wp_nonce_field( basename( __FILE__ ), 'student_nonce' );
 		$student_stored_meta = get_post_meta( $post->ID);
+		
 		// retrieve student data
 		?>
 		<style>
@@ -414,6 +416,48 @@ class DX_Plugin_Base {
 
 
 	/***************************   /R E S T - A P I *************************************/
+
+
+	/***************************   CUSTOM PAGE TEMPLATE  *************************************/
+
+	public function load_post_type_templates( $original_template ) {
+
+     if ( get_query_var( 'post_type' ) == 'student' ) {
+
+          if ( is_archive() || is_search() ) {
+
+		           if ( file_exists( get_stylesheet_directory(). '/archive-student.php' ) ) {
+
+		                 return get_stylesheet_directory() . '/archive-student.php';
+
+		           } else {
+
+		                  return plugin_dir_path( __FILE__ ) . 'inc/archive-student.php';
+
+		           }
+
+		       } elseif(is_singular('student')) {
+
+	               if (  file_exists( get_stylesheet_directory(). '/single-student.php' ) ) {
+
+	                       return get_stylesheet_directory() . '/single-student.php';
+
+	               } else {
+
+	                       return plugin_dir_path( __FILE__ ) . 'inc/single-student.php';
+	               }
+
+		       }else{
+
+	       			return get_page_template();
+
+	       		}
+       }
+        return $original_template;
+	}
+
+	/***************************   /CUSTOM PAGE TEMPLATE *************************************/
+
 	/**
 	 * Initialize the Settings class
 	 * 
