@@ -90,6 +90,9 @@ class DX_Plugin_Base {
 		
 		// Add a sample widget
 		add_action( 'widgets_init', array( $this, 'dx_sample_widget' ) );
+
+		// Add Student API
+		add_action( '');
 		
 		/*
 		 * TODO:
@@ -349,6 +352,7 @@ class DX_Plugin_Base {
 				'not_found' =>  __("No student found", 'dxbase' ),
 				'not_found_in_trash' => __("No student found in Trash", 'dxbase' ),
 			),
+
 			'description' => __("Students for the demo", 'dxbase'),
 			'public' => true,
 			'publicly_queryable' => true,
@@ -356,6 +360,9 @@ class DX_Plugin_Base {
 			'rewrite' => true,
 			'exclude_from_search' => true,
 			'show_ui' => true,
+			'show_in_rest' => true,
+			'rest_base' => 'student',
+			'rest_controller_class' => 'WP_REST_Posts_Controller', 
 			'show_in_menu' => true,
 			'menu_position' => 40, // probably have to change, many plugins use this
 			'supports' => array(
@@ -365,6 +372,7 @@ class DX_Plugin_Base {
 				'custom-fields',
 				'page-attributes',
 			),
+
 			'taxonomies' => array( 'post_tag' )
 		));	
 	}
@@ -395,12 +403,43 @@ class DX_Plugin_Base {
 			),
 			'show_ui' => true,
 			'query_var' => true,
-			'rewrite' => true,
+			'rewrite'           => array( 'slug' => 'student' ),
+	  		'show_in_rest'       => true,
+	  		'rest_base'          => 'student',
+	  		'rest_controller_class' => 'WP_REST_Terms_Controller'
+
 		));
 		
 		register_taxonomy_for_object_type( 'pluginbase_taxonomy', 'pluginbase' );
 	}
-	
+	/***************************   R E S T - A P I *************************************/
+	//The Following registers an api route with multiple parameters. 
+	 
+	/*public function add_custom_student_api(){
+	    register_rest_route( '/wp/v2', '/student/(?P<id>\d+)', array(
+	        'methods' => 'GET',
+	        'callback' => 'get_student_data_callback'
+	    ));
+	}
+
+	add_action( 'rest_api_init', 'add_custom_student_api');
+
+	public function get_student_data_callback( $request_data ) {
+		$r = array();
+		$parameters = $request_data->get_params();
+		$args = array('post_type' => 'student', 'post_status' => 'publish');
+		$loop = new WP_Query( $args );
+
+		while ( $loop->have_posts() ) : $loop->the_post();
+			$r[] = array(
+					'name' => get_the_title(),
+					'description' => get_the_content()
+				);
+		endwhile;
+		return $r;
+	}*/
+
+	/***************************   /R E S T - A P I *************************************/
 	/**
 	 * Initialize the Settings class
 	 * 
