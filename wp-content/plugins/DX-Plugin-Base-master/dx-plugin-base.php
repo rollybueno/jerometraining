@@ -68,7 +68,7 @@ class DX_Plugin_Base {
 		// register meta boxes for Pages (could be replicated for posts and custom post types)
 		add_action( 'add_meta_boxes', array( $this, 'dx_meta_boxes_callback' ) );
 		
-		// register save_post hooks for saving the custom fields
+		// register save_post - this to save the data of student meta_box
 		add_action( 'save_post', array( $this, 'student_meta_save' ) );
 		
 		// Register custom post types and taxonomies
@@ -281,7 +281,7 @@ class DX_Plugin_Base {
 	public function dx_bottom_student_meta_box( $post, $metabox) {
 		wp_nonce_field( basename( __FILE__ ), 'student_nonce' );
 		$student_stored_meta = get_post_meta( $post->ID);
-		
+
 		// retrieve student data
 		?>
 		<style>

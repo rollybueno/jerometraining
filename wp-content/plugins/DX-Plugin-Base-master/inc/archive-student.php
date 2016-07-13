@@ -1,29 +1,21 @@
-<?php 
-/**
- * The template for displaying all archive posts and attachments.
- *
-**/
+<?php
+/*
+*
+*
+*/
 ?>
 
-<?php get_header(); ?>
+get_header(); ?>
 
 <?php
+	if(have_posts()) : while(have_posts()) : the_post();
+		the_title();
+		echo '<div class="entry-content">';
+		the_content();
+		echo '</div>';
 
-$args = array( 'post_type' => 'student', 'posts_per_page' => 10 );
-
-$loop = new WP_Query( $args );
-while ( $loop->have_posts() ) : $loop->the_post();
-    echo "h1>";
-    the_title();
-    echo "</h1>";
-    echo "<br />";
-    echo '<div class="entry-content">';
-    the_content();
-    echo '</div>';
-endwhile;
+	endwhile;
+	endif;
 
 ?>
-
-<?php get_sidebar(); ?>
-
 <?php get_footer(); ?>
