@@ -8,11 +8,15 @@ get_header(); ?>
 <div id="primary" class="content-area">
 	<main id="main" class="site-main" role="main">
     <h1>Single Page</h1>
-    <?php
-    $student_post = array( 'post_type' => 'student', );
-    $loop = new WP_Query( $student_post );
-    ?>
-    <?php while ( $loop->have_posts() ) : $loop->the_post();?>
+    
+        <?php
+        $student_post = array( 'post_type' => 'student', );
+        $loop = new WP_Query( $student_post );
+        ?>
+    <?php 
+
+        while ( have_posts() ) : the_post(); get_template_part( 'student', 'single' ); ?>
+
         <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
             <div class="container">
  
@@ -33,7 +37,7 @@ get_header(); ?>
             </div>
         </article>
  
-    <?php endwhile; ?>
+        <?php endwhile; ?>
 
     </main>
     <?php get_sidebar( 'content-bottom' ); ?>
