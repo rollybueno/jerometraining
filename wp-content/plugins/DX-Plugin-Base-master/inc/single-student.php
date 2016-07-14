@@ -13,9 +13,12 @@ get_header(); ?>
         $student_post = array( 'post_type' => 'student', );
         $loop = new WP_Query( $student_post );
         ?>
-    <?php 
 
-        while ( have_posts() ) : the_post(); get_template_part( 'student', 'single' ); ?>
+        <?php 
+
+        while ( have_posts() ) : the_post(); get_template_part( 'student', 'single' ); 
+
+        ?>
 
         <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
             <div class="container">

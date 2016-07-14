@@ -89,7 +89,8 @@ class DX_Plugin_Base {
 		add_action( 'init', array( $this, 'dx_student_shortcode' ) );
 		
 		// Add a sample widget
-		add_action( 'widgets_init', array( $this, 'dx_sample_widget' ) );
+		add_action( 'widgets_init', array( $this, 'dx_student_widget' ) );
+		add_action( 'widgets_init', array( $this, 'jerome_widget' ) );
 		
 		// Page Template
 		add_action( 'template_include', array( $this, 'load_post_type_templates'), 1 );
@@ -418,16 +419,6 @@ class DX_Plugin_Base {
 
 
 	/***************************   CUSTOM PAGE TEMPLATE  *************************************/
-	/*public function student_custom_template($single) {
-	    global $wp_query, $post;
-
-	    /* Checks for single template by post type */
-	    /*if ($post->post_type == "student"){
-	        if(file_exists(PLUGIN_PATH . '/inc/single-student.php'))
-	            return PLUGIN_PATH . '/inc/single-student.php';
-	    }
-	    return $single;
-	}*/
 	
 	public function load_post_type_templates( $original_template ) {
 
@@ -435,13 +426,13 @@ class DX_Plugin_Base {
 
           if ( is_archive() || is_search() ) {
 
-		           if ( file_exists( get_stylesheet_directory(). '/archive-student.php' ) ) {
+		           if ( file_exists( get_stylesheet_directory(). '/archive.php' ) ) {
 
-		                 return get_stylesheet_directory() . '/archive-student.php';
+		                 return get_stylesheet_directory() . '/archive.php';
 
 		           } else {
 
-		                  return plugin_dir_path( __FILE__ ) . 'inc/archive-student.php';
+		                  return plugin_dir_path( __FILE__ ) . 'inc/archive.php';
 
 		           }
 
@@ -619,10 +610,12 @@ class DX_Plugin_Base {
 	/**
 	 * Hook for including a sample widget with options
 	 */
-	public function dx_sample_widget() {
-		include_once DXP_PATH_INCLUDES . '/dx-sample-widget.class.php';
+	public function dx_student_widget() {
+		include_once DXP_PATH_INCLUDES . '/dx-student-widget.class.php';
 	}
-	
+	public function jerome_widget() {
+		include_once DXP_PATH_INCLUDES . '/jerome-widget.class.php';
+	}
 	/**
 	 * Add textdomain for plugin
 	 */

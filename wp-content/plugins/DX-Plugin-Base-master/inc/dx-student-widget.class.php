@@ -7,16 +7,16 @@
  * @author nofearinc
  *
  */
-class DX_Sample_Widget extends WP_Widget {
+class DX_Student_Widget extends WP_Widget {
 
     /**
      * Register the widget
      */
     public function __construct() {
         parent::__construct(
-            'dx_sample_widget',
-            __("DX Sample Widget", 'dxbase'),
-            array( 'classname' => 'dx_widget_sample_single', 'description' => __( "Display a sample DX Widget", 'dxbase' ) ),
+            'dx_student_widget',
+            __("DX Student Widget", 'dxbase'),
+            array( 'classname' => 'dx_widget_student_single', 'description' => __( "Display a Student Widget", 'dxbase' ) ),
             array( ) // you can pass width/height as parameters with values here
         );
     }
@@ -34,8 +34,8 @@ class DX_Sample_Widget extends WP_Widget {
 
         // Start sample widget body creation with output code (get arguments from options and output something)
         
-        $out = '<p>Widget body<p>';
-		$out .= '<p>Sample text: '. $instance['sample_text'] . '</p>';
+        $out = '';
+		$out .= '<p>Name: '. $instance['student_name'] . '</p>';
 		$out .= '<p>Sample dropdown: '.  $instance['sample_dropdown'] . '</p>';
         
         // End sample widget body creation
@@ -63,7 +63,7 @@ class DX_Sample_Widget extends WP_Widget {
         $instance = $old_instance;
 
         $instance['title'] = strip_tags($new_instance['title']);
-        $instance['sample_text'] = strip_tags($new_instance['sample_text']);
+        $instance['student_name'] = strip_tags($new_instance['student_name']);
         $instance['sample_dropdown'] = strip_tags($new_instance['sample_dropdown']);
         
         return $instance;
@@ -74,20 +74,20 @@ class DX_Sample_Widget extends WP_Widget {
      */
     public function form ( $instance ) {
 		$instance_defaults = array(
-				'title' => 'Instance title',
-				'sample_text' => '',
+				'title' => 'Student List',
+				'student_name' => '',
 				'sample_dropdown' => '',
 		);
 
 		$instance = wp_parse_args( $instance, $instance_defaults );
 
         $title = esc_attr( $instance[ 'title' ] );
-        $sample_text = esc_attr( $instance[ 'sample_text' ] );
+        $student_name = esc_attr( $instance[ 'student_name' ] );
         $sample_dropdown = esc_attr( $instance[ 'sample_dropdown' ] );
         
         ?>
 		<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e( "Title:", 'dxbase'); ?></label> <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>" /></p>
-		<p><label for="<?php echo $this->get_field_id('sample_text'); ?>"><?php _e( "Sample Text:", 'dxbase'); ?></label> <input class="widefat" id="<?php echo $this->get_field_id('sample_text'); ?>" name="<?php echo $this->get_field_name('sample_text'); ?>" type="text" value="<?php echo $sample_text; ?>" /></p>
+		<p><label for="<?php echo $this->get_field_id('student_name'); ?>"><?php _e( "Name:", 'dxbase'); ?></label> <input class="widefat" id="<?php echo $this->get_field_id('student_name'); ?>" name="<?php echo $this->get_field_name('student_name'); ?>" type="text" value="<?php echo $student_name; ?>" /></p>
 		<p>
 			<label for="<?php echo $this->get_field_id('sample_dropdown'); ?>"><?php _e( "Areas:", 'dxbase' ); ?></label>
 			<select name="<?php echo $this->get_field_name('sample_dropdown'); ?>" id="<?php echo $this->get_field_id('sample_dropdown'); ?>" class="widefat">
@@ -105,4 +105,4 @@ class DX_Sample_Widget extends WP_Widget {
 }
 
 // Register the widget for use
-register_widget('DX_Sample_Widget');
+register_widget('DX_Student_Widget');
