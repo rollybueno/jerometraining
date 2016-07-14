@@ -91,10 +91,11 @@ class DX_Plugin_Base {
 		// Add a sample widget
 		add_action( 'widgets_init', array( $this, 'dx_sample_widget' ) );
 
-		// Add Student API
+			/* Filter the single_template with our custom function*/
+		//add_filter('single_template', 'student_custom_template');
 		
 		// Page Template
-		add_action( 'template_include', array( $this, 'load_post_type_templates') );
+		add_action( 'template_include', array( $this, 'load_post_type_templates'), 1 );
 		/*
 		 * TODO:
 		 * 		template_redirect
@@ -365,6 +366,7 @@ class DX_Plugin_Base {
 			'show_ui' => true,
 			'show_in_menu' => true,
 			'menu_position' => 40, // probably have to change, many plugins use this
+			'menu_icon' => 'dashicons-universal-access-alt',
 			'supports' => array(
 				'title',
 				'editor',
@@ -419,7 +421,17 @@ class DX_Plugin_Base {
 
 
 	/***************************   CUSTOM PAGE TEMPLATE  *************************************/
+	/*public function student_custom_template($single) {
+	    global $wp_query, $post;
 
+	    /* Checks for single template by post type */
+	    /*if ($post->post_type == "student"){
+	        if(file_exists(PLUGIN_PATH . '/inc/single-student.php'))
+	            return PLUGIN_PATH . '/inc/single-student.php';
+	    }
+	    return $single;
+	}*/
+	
 	public function load_post_type_templates( $original_template ) {
 
      if ( get_query_var( 'post_type' ) == 'student' ) {

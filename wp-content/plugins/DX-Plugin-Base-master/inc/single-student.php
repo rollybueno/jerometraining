@@ -1,26 +1,45 @@
 <?php
-/**
- * The template for displaying all single posts and attachments.
- *
-**/
+ /*
+ * Template Name: Student Single Template
+ */
+ 
 get_header(); ?>
 
-<?php
+<div id="primary" class="content-area">
+	<main id="main" class="site-main" role="main">
+    <?php
+    $student_post = array( 'post_type' => 'student', );
+    $loop = new WP_Query( $student_post );
+    ?>
+    <?php while ( $loop->have_posts() ) : $loop->the_post();?>
+        <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+            <header class="entry-header">
+ 
+                <strong>Name: </strong><?php the_title(); ?><br />
+                <strong>ID: </strong>
+                <?php echo esc_html( get_post_meta( get_the_ID(), 'student_id', true ) ); ?>
+                <br />
+                <strong>Section: </strong>
+                <?php echo esc_html( get_post_meta( get_the_ID(), 'student_section', true ) ); ?>
+                <br />
+                <strong>Year: </strong>
+                <?php echo esc_html( get_post_meta( get_the_ID(), 'student_year', true ) ); ?>
+                <br />
+                <strong>Address: </strong>
+                <?php echo esc_html( get_post_meta( get_the_ID(), 'student_address', true ) ); ?>
+                <br />
+				<p class="entry-content">Summary: <?php the_content(); ?></p>
+            </header>
+        </article>
+ 
+    <?php endwhile; ?>
 
-$args = array( 'post_type' => 'student', 'posts_per_page' => 10 );
+    </main>
+    <?php get_sidebar( 'content-bottom' ); ?>
+</div>
 
-$loop = new WP_Query( $args );
-while ( $loop->have_posts() ) : $loop->the_post();
-    echo "h1>";
-    the_title();
-    echo "</h1>";
-    echo "<br />";
-    echo '<div class="entry-content">';
-    the_content();
-    echo '</div>';
-endwhile;
 
-?>
+<?php wp_reset_query(); ?>
 
 <?php get_sidebar(); ?>
 
