@@ -94,6 +94,9 @@ class DX_Plugin_Base {
 		
 		// Page Template
 		add_action( 'template_include', array( $this, 'load_post_type_templates'), 1 );
+
+		// REST API 
+
 		/*
 		 * TODO:
 		 * 		template_redirect
@@ -358,8 +361,8 @@ class DX_Plugin_Base {
 			'query_var' => true,
 			'rewrite' => array( 'slug' => 'student' ),
 			'show_in_rest'       => true,
-	  		'rest_base'          => 'student-api',
-	  		'rest_controller_class' => 'WP_REST_Posts_Controller',
+	  		/*'rest_base'          => 'student-api',
+	  		'rest_controller_class' => 'WP_REST_Posts_Controller',*/
 			'exclude_from_search' => true,
 			'show_ui' => true,
 			'show_in_menu' => true,
@@ -403,16 +406,51 @@ class DX_Plugin_Base {
 			'show_ui' => true,
 			'query_var' => true,
 			'rewrite'           => array( 'slug' => 'student' ),
-	  		'show_in_rest'       => true,
+	  		/*'show_in_rest'       => true,
 	  		'rest_base'          => 'genre',
-	  		'rest_controller_class' => 'WP_REST_Terms_Controller',
+	  		'rest_controller_class' => 'WP_REST_Terms_Controller',*/
 		));
 		
 		register_taxonomy_for_object_type( 'pluginbase_taxonomy', 'pluginbase' );
 	}
 	/***************************   R E S T - A P I *************************************/
 	//The Following registers an api route with multiple parameters. 
-	 
+	 public function wpt_all_student() {
+	register_rest_route( '/wp/v2', '/get/allstudent', array(
+        'methods' => 'GET',
+        'callback' => 'all_student_callback',
+    ));
+	}
+
+	function all_student_callback( $request_data ) {
+		$r = array();
+		$parameters = $request_data->get_params();
+		$args = array('post_type' => 'student', 'post_status' => 'publish');
+		$loop = new WP_Query( $args );
+
+		while ( $loop->have_posts() ) : $loop->the_post();
+			$r[] = array(
+				'post_id' => get_the_ID(),
+				'name' => get_the_title(),
+				'description' => get_the_content(),
+				'student_year' => get_post_meta(get_the_ID(), 'student_year', true),
+				'student_section' => get_post_meta(get_the_ID(), 'student_section', true),
+				'student_address' => get_post_meta(get_the_ID(), 'student_address', true),
+				'student_id' => get_post_meta(get_the_ID(), 'student_id', true)
+			);
+		endwhile;
+		return $r;
+	}
+
+	function meta_data($post_id, $field, $value = '') {
+		if (empty( $value ) || !$value) {
+			delete_post_meta( $post_id, $field );
+		} elseif (!get_post_meta($post_id, $field)) {
+			add_post_meta($post_id, $field, $value);
+		} else {
+			update_post_meta($post_id, $field, $value);
+		}
+	}
 
 
 	/***************************   /R E S T - A P I *************************************/
@@ -533,6 +571,8 @@ class DX_Plugin_Base {
 	/**
 	 * Add textdomain for plugin
 	 */
+
+
 	public function dx_add_textdomain() {
 		load_plugin_textdomain( 'dxbase', false, dirname( plugin_basename( __FILE__ ) ) . '/lang/' );
 	}
@@ -593,3 +633,207 @@ function dx_on_deactivate_callback() {
 
 // Initialize everything
 $dx_plugin_base = new DX_Plugin_Base();
+
+
+/**************************************************************/
+// GET ALL STUDENT DATA
+
+function dx_api_get_all_student() {
+	register_rest_route( '/wp/v2', '/get/allstudent', array(
+        'methods' => 'GET',
+        'callback' => 'get_all_student_callback',
+    ));
+}
+
+
+function get_all_student_callback( $request_data ) {
+	$r = array();
+	$parameters = $request_data->get_params();
+	$args = array('post_type' => 'student', 'post_status' => 'publish');
+	$loop = new WP_Query( $args );
+
+	while ( $loop->have_posts() ) : $loop->the_post();
+		$r[] = array(
+			'post_id' => get_the_ID(),
+			'name' => get_the_title(),
+			'description' => get_the_content(),
+			'student_year' => get_post_meta(get_the_ID(), 'student_year', true),
+			'student_section' => get_post_meta(get_the_ID(), 'student_section', true),
+			'student_address' => get_post_meta(get_the_ID(), 'student_address', true),
+			'student_id' => get_post_meta(get_the_ID(), 'student_id', true)
+		);
+	endwhile;
+	return $r;
+}
+
+add_action( 'rest_api_init', 'dx_api_get_all_student' );
+
+function meta_data($post_id, $field, $value = '') {
+	if (empty( $value ) || !$value) {
+		delete_post_meta( $post_id, $field );
+	} elseif (!get_post_meta($post_id, $field)) {
+		add_post_meta($post_id, $field, $value);
+	} else {
+		update_post_meta($post_id, $field, $value);
+	}
+}
+
+/***********************************************************************************/
+
+// GET ADD STUDENT 
+
+function dx_api_add_student() {
+	register_rest_route( '/wp/v2', '/get/addstudent', array(
+        'methods' => 'GET',
+        'callback' => 'get_add_student_callback',
+    ));
+}
+add_action( 'rest_api_init', 'dx_api_add_student' );
+
+function get_add_student_callback( $request_data ) {
+	$j['status'] = 'fail';
+	$parameters = $request_data->get_params();
+	$student_stored_meta['student_year'] = isset($parameters['student_year']) ? $parameters['student_year'] : '';
+	$student_stored_meta['student_section'] = isset($parameters['student_section']) ? $parameters['student_section'] : '';
+	$student_stored_meta['student_address'] = isset($parameters['student_address']) ? $parameters['student_address'] : '';
+	$student_stored_meta['student_id'] = isset($parameters['student_id']) ? $parameters['student_id'] : '';
+
+	if (isset($parameters['title']) && isset($parameters['content'])) {
+		$post = array(
+			'post_title' => $parameters['title'],
+			'post_content' => $parameters['content'],
+			'post_status' => 'publish',
+			'post_type' => 'student'
+		);
+		$post_id = wp_insert_post($post);
+		if ($post_id) {
+			foreach ($student_stored_meta as $key => $value) {
+				meta_data($post_id, $key, $value);
+			}
+			$j['status'] = 'success';
+		}
+	}
+	return $j;
+}
+
+/***********************************************************************************/
+
+// EDIT STUDENT
+
+function dx_api_edit_student() {
+	register_rest_route( '/wp/v2', '/get/editstudent', array(
+        'methods' => 'GET',
+        'callback' => 'get_edit_student_callback',
+    ));
+}
+add_action( 'rest_api_init', 'dx_api_edit_student' );
+
+function get_edit_student_callback( $request_data ) {
+	$j['status'] = 'fail';
+	$parameters = $request_data->get_params();
+	$student_meta = array();
+
+	if (isset($parameters['post_id'])) {
+		if (isset($parameters['student_year']))
+			$student_meta['student_year'] = $parameters['student_year'];
+
+		if (isset($parameters['student_section']))
+			$student_meta['student_section'] = $parameters['student_section'];
+
+		if (isset($parameters['student_address']))
+			$student_meta['student_address'] = $parameters['student_address'];
+
+		if (isset($parameters['student_id']))
+			$student_meta['student_id'] = $parameters['student_id'];
+
+		if (isset($parameters['title']) && isset($parameters['content'])) {
+			$post = array(
+				'ID' => $parameters['post_id'],
+				'post_title' => $parameters['title'],
+				'post_content' => $parameters['content'],
+				'post_status' => 'publish',
+				'post_type' => 'student'
+			);
+
+			$post_id = wp_insert_post($post);
+			if ($post_id) {
+				$j['status'] = 'success';
+				if (!empty($student_meta)) {
+					foreach ($student_meta as $key => $value) {
+						meta_data($post_id, $key, $value);
+					}
+				}
+			}
+		}
+	} else {
+		$j['xmessage'] = 'bad request';
+	}
+	return $j;
+}
+
+/***********************************************************************************/
+
+// Delete Student 
+
+function dx_api_delete_student() {
+	register_rest_route( '/wp/v2', '/get/deletestudent', array(
+        'methods' => 'GET',
+        'callback' => 'get_delete_student_callback',
+    ));
+}
+add_action( 'rest_api_init', 'dx_api_delete_student' );
+
+function get_delete_student_callback( $request_data ) {
+	$j['status'] = 'fail';
+	$parameters = $request_data->get_params();
+	$student_meta = array(
+		'student_year',
+		'student_section',
+		'student_address',
+		'student_id'
+	);
+
+	if (isset($parameters['post_id'])) {
+		$deleted = wp_delete_post($parameters['post_id'], true);
+		if ($deleted) {
+			$j['status'] = 'success';
+			for ($i=0; $i < count($student_meta); $i++) {
+				meta_data($parameters['post_id'], $student_meta[$i]);
+			}
+		}
+	}
+	return $j;
+}
+
+/***********************************************************************************/
+
+// GET BY ID
+
+function dx_api_get_student() {
+	register_rest_route( '/wp/v2', '/get/student', array(
+        'methods' => 'GET',
+        'callback' => 'get_student_callback',
+    ));
+}
+add_action( 'rest_api_init', 'dx_api_get_student' );
+
+function get_student_callback( $request_data ) {
+	$j['status'] = 'fail';
+	$parameters = $request_data->get_params();
+	if (isset($parameters['post_id'])) {
+		$post = get_post($parameters['post_id']);
+		if ($post) {
+			$j['status'] = 'success';
+			$j['data'] = array(
+				'post_id' => $post->ID,
+				'name' => $post->post_title,
+				'description' => $post->post_content,
+				'student_year' => get_post_meta($post->ID, 'student_year', true),
+				'student_section' => get_post_meta($post->ID, 'student_section', true),
+				'student_address' => get_post_meta($post->ID, 'student_address', true),
+				'student_id' => get_post_meta($post->ID, 'student_id', true)
+			);
+		}
+	}
+	return $j;
+}
