@@ -52,3 +52,28 @@ get_header(); ?>
 <?php get_sidebar(); ?>
 
 <?php get_footer(); ?>
+
+
+<div class="container">
+    <article>
+        <?php
+
+            $args=array(
+                    'post_type' =>  'event',
+                    'posts_per_page'    => 10,
+                    'post_status' => 'publish'
+                    );
+            $loop = new WP_Query($args);
+
+            while ( $loop->have_posts() ) : $loop->the_post(); ?>
+
+                <div class="main-content">
+                    <h1><?php the_title(); ?></h1>
+                    <br />
+                    <p>
+                        <?php the_content(); ?>
+                    </p>
+                </div>
+        ?>
+    </article>
+</div>
